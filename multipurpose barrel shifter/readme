@@ -1,0 +1,6 @@
+About the code:
+LR signal is used for left/right shift direction.
+lr = 1 ,  left shift.
+lr = 0 , right shift.
+This code is LINT clean code.
+Verified on simulator.
