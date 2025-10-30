@@ -1,0 +1,225 @@
+🧩 RTL Design Project List — Verilog Practice (2-Year Level)
+
+⸻
+
+🔹 1️⃣ Basic Sequential & Combinational Logic
+
+1. Priority Arbiter (4-way)
+	•	Module: priority_arbiter.v
+	•	Inputs: req[3:0]
+	•	Output: grant[3:0] (one-hot)
+	•	Goal: Learn combinational arbitration logic, priority encoding.
+	•	Testbench: Random req patterns, check only one grant active and priority respected.
+
+⸻
+
+2. Up/Down Counter (Parameterized)
+	•	Module: up_down_counter.v
+	•	Inputs: clk, rst_n, en, dir
+	•	Output: count[N-1:0]
+	•	Goal: Synchronous enable/disable, up-down direction, wrap-around vs saturation.
+	•	Testbench: Toggle direction mid-count, apply enable gating.
+
+⸻
+
+3. Sequence Detector (FSM)
+	•	Module: seq_detector_1011.v
+	•	Inputs: clk, rst_n, in_bit
+	•	Output: detect
+	•	Goal: Build Mealy FSM that detects “1011” in a serial bitstream.
+	•	Testbench: Apply overlapping patterns (e.g., 1011011).
+
+⸻
+
+⸻
+
+⏱ 2️⃣ Pipelining & Throughput Optimization
+
+4. 3-Stage Pipelined Multiplier
+	•	Module: pipelined_multiplier.v
+	•	Inputs: clk, rst_n, a[15:0], b[15:0]
+	•	Output: product[31:0]
+	•	Goal: Learn latency, valid signal tracking across stages.
+	•	Testbench: Issue new operands every clock, verify delayed output.
+
+⸻
+
+5. Parameterized Pipeline Register
+	•	Module: pipeline_register.v
+	•	Inputs: clk, rst_n, din[W-1:0]
+	•	Output: dout[W-1:0]
+	•	Parameter: DEPTH
+	•	Goal: Implement configurable register pipeline using generate loop.
+	•	Testbench: Verify for DEPTH = 0, 1, 3.
+
+⸻
+
+6. Synchronous FIFO
+	•	Module: sync_fifo.v
+	•	Inputs: clk, rst_n, wr_en, rd_en, din[W-1:0]
+	•	Outputs: dout[W-1:0], full, empty
+	•	Goal: Pointer-based FIFO, no combinational feedback.
+	•	Testbench: Random write/read pattern with boundary conditions.
+
+⸻
+
+⸻
+
+🧠 3️⃣ FSM & Control Design
+
+7. Elevator Controller (4 Floors)
+	•	Module: elevator_ctrl.v
+	•	Inputs: clk, rst_n, req[3:0]
+	•	Outputs: floor[1:0], dir_up
+	•	Goal: FSM scheduling, priority logic, directional continuity.
+	•	Testbench: Generate random requests, check movement sequence.
+
+⸻
+
+8. UART Transmitter
+	•	Module: uart_tx.v
+	•	Inputs: clk, rst_n, tx_start, tx_data[7:0]
+	•	Outputs: tx_out, tx_busy
+	•	Goal: Design bit timing logic (1 start, 8 data, 1 stop).
+	•	Testbench: Compare output serial waveform to expected frame.
+
+⸻
+
+9. Traffic Light Controller
+	•	Module: traffic_light_ctrl.v
+	•	Inputs: clk, rst_n, sensor_main, sensor_side
+	•	Outputs: light_main[2:0], light_side[2:0]
+	•	Goal: FSM with timing counters, sensor-based preemption.
+	•	Testbench: Toggle sensors at random times, ensure safety rules (no both green).
+
+⸻
+
+⸻
+
+🔄 4️⃣ CDC (Clock Domain Crossing)
+
+10. 2-FF Synchronizer
+	•	Module: sync_2ff.v
+	•	Inputs: clk_dst, rst_n, async_in
+	•	Outputs: sync_out
+	•	Goal: Understand metastability isolation and latency.
+	•	Testbench: Simulate async pulses with two different clocks.
+
+⸻
+
+11. REQ/ACK Handshake Synchronizer
+	•	Module: handshake_sync.v
+	•	Inputs: clk_a, clk_b, event_a
+	•	Output: pulse_b
+	•	Goal: Safe event transfer with two-way handshake.
+	•	Testbench: Generate multiple async events at random intervals.
+
+⸻
+
+12. Asynchronous FIFO
+	•	Module: async_fifo.v
+	•	Inputs: wr_clk, rd_clk, wr_en, rd_en, din[7:0]
+	•	Outputs: dout[7:0], full, empty
+	•	Goal: Gray-coded pointers, dual clock domain CDC.
+	•	Testbench: Randomize clock ratios (e.g., 1:3, 2:5), verify data integrity.
+
+⸻
+
+⸻
+
+⚡ 5️⃣ Interface & Bus Protocols
+
+13. AXI4-Lite Slave
+	•	Module: axi_lite_slave.v
+	•	Inputs: Standard AXI signals
+(AWADDR, WVALID, WDATA, etc.)
+	•	Goal: Handle address phase, data phase, response.
+	•	Testbench: Use AXI master TB that writes & reads back registers.
+
+⸻
+
+14. APB to AXI-Lite Bridge
+	•	Module: apb2axi_bridge.v
+	•	Goal: Convert single APB transaction into AXI-Lite transfer.
+	•	Testbench: Drive APB writes and verify AXI handshakes.
+
+⸻
+
+15. AXI Stream Width Converter (32→64 bits)
+	•	Module: axi_stream_width_conv.v
+	•	Inputs: s_axis_tdata[31:0], s_axis_tvalid
+	•	Outputs: m_axis_tdata[63:0], m_axis_tvalid
+	•	Goal: Aggregate two input beats into one output beat.
+	•	Testbench: Feed multiple packets, verify correct packing.
+
+⸻
+
+⸻
+
+🧮 6️⃣ Arithmetic & DSP
+
+16. Signed Multiplier with Overflow
+	•	Module: signed_mult.v
+	•	Inputs: clk, a[15:0], b[15:0]
+	•	Outputs: result[31:0], overflow
+	•	Goal: Implement signed multiplication and detect overflow.
+	•	Testbench: Random operands, edge cases (±32768 × 2).
+
+⸻
+
+17. 4-Tap FIR Filter
+	•	Module: fir_filter.v
+	•	Inputs: clk, rst_n, data_in
+	•	Outputs: data_out
+	•	Parameters: coefficients
+	•	Goal: Implement MAC structure (shift register + multiply + sum).
+	•	Testbench: Apply impulse input; verify impulse response = coefficients.
+
+⸻
+
+18. Fixed-Point Divider (Restoring Algorithm)
+	•	Module: fixed_div.v
+	•	Inputs: clk, rst_n, start, dividend, divisor
+	•	Outputs: quotient, remainder, done
+	•	Goal: Iterative division using FSM and shift/subtract logic.
+	•	Testbench: Verify multiple divisions with edge cases (divide by 0).
+
+⸻
+
+⸻
+
+🧱 7️⃣ Low-Power & DFT
+
+19. Clock Gating Cell
+	•	Module: clock_gater.v
+	•	Inputs: clk_in, en
+	•	Output: clk_gated
+	•	Goal: Generate glitch-free gated clock (with latch-based enable).
+	•	Testbench: Toggle enable around clock edges to ensure no glitches.
+
+⸻
+
+20. Scan-Chain Register File
+	•	Module: regfile_scan.v
+	•	Inputs: clk, wr_en, rd_addr, wr_addr, wr_data, scan_en, scan_in
+	•	Outputs: rd_data, scan_out
+	•	Goal: 8x8 register file with scan chain for DFT.
+	•	Testbench: Check normal and scan-shift operation.
+
+
+🧠 Tips for Each Project
+	•	Use non-blocking (<=) for sequential always blocks.
+	•	Add synchronous reset logic.
+	•	Make all modules parameterized for width/depth.
+	•	Add $monitor, $display, and waveform dumping ($dumpfile, $dumpvars) in TBs.
+	•	Document latency, throughput, and critical path after synthesis.
+	•	Use assertions to verify behavior (SystemVerilog assertions if supported).
+
+⸻
+
+🏁 Goal
+
+By completing these 20 RTL modules + testbenches:
+✅ You’ll cover FSM, datapaths, CDC, bus protocols, DSP, low power — all key areas asked in interviews.
+✅ You’ll have a portfolio you can show interviewers — or link to your GitHub.
+✅ You’ll be comfortable answering deep “how would you design…” questions.
