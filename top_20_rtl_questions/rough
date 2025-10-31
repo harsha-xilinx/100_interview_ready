@@ -1,0 +1,115 @@
+//======================================================================
+// Parameterized Round Robin Arbiter
+// Author: Harsh Agrawal
+// Description:
+//   - N-way round-robin arbiter
+//   - Rotates priority each cycle based on last granted index
+//   - Supports synchronous reset
+//======================================================================
+module round_robin_arbiter #(
+    parameter N = 4
+)(
+    input  wire             clk,
+    input  wire             rst_n,
+    input  wire [N-1:0]     req,     // Request lines
+    output reg  [N-1:0]     grant    // One-hot grant output
+);
+
+    // Keeps track of last granted position
+    reg [$clog2(N)-1:0] last_grant;
+
+    integer i;
+    reg [N-1:0] grant_next;
+
+    always @(*) begin
+        grant_next = {N{1'b0}};
+
+        // Round-robin search
+        for (i = 0; i < N; i = i + 1) begin
+            int idx;
+            idx = (last_grant + i + 1) % N;  // next priority position
+            if (req[idx]) begin
+                grant_next[idx] = 1'b1;
+                disable for;  // stop once granted
+            end
+        end
+    end
+
+    // Sequential logic for state update
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            last_grant <= 0;
+            grant      <= {N{1'b0}};
+        end else begin
+            grant <= grant_next;
+
+            // Update last_grant pointer if any grant was issued
+            for (i = 0; i < N; i = i + 1)
+                if (grant_next[i])
+                    last_grant <= i[$clog2(N)-1:0];
+        end
+    end
+
+endmodule
+
+
+
+`timescale 1ns/1ps
+
+module tb_round_robin_arbiter;
+
+    parameter N = 4;
+
+    reg clk, rst_n;
+    reg  [N-1:0] req;
+    wire [N-1:0] grant;
+
+    integer i;
+
+    // DUT
+    round_robin_arbiter #(N) dut (
+        .clk(clk),
+        .rst_n(rst_n),
+        .req(req),
+        .grant(grant)
+    );
+
+    // Clock generation
+    always #5 clk = ~clk;
+
+    initial begin
+        clk = 0;
+        rst_n = 0;
+        req = 0;
+        #15;
+        rst_n = 1;
+    end
+
+    // Stimulus
+    initial begin
+        @(posedge rst_n);
+        #10;
+
+        // Various request patterns
+        req = 4'b1111;  // all request
+        repeat (10) @(posedge clk);
+
+        req = 4'b0101;  // alternating request
+        repeat (10) @(posedge clk);
+
+        req = 4'b0001;  // single requester
+        repeat (5) @(posedge clk);
+
+        req = 4'b1010;  // other pattern
+        repeat (10) @(posedge clk);
+
+        $finish;
+    end
+
+    // Monitor
+    initial begin
+        $display("Time\tReq\tGrant");
+        $monitor("%0t\t%b\t%b", $time, req, grant);
+    end
+
+endmodule
