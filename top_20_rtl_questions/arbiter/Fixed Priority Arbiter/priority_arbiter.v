@@ -51,9 +51,9 @@ module tb_priority_arbiter;
     reg  [N-1:0] req;
     wire [N-1:0] grant;
   priority_arbiter pa1 (.req(req), .grant(grant));
-
+reg found;
   reg [N-1:0] expected_value; 
-integer i,j;  
+  integer i,j;  
   initial
     begin
       $display("Time\tReq\tGrant\tExpected\tResult");
@@ -63,14 +63,18 @@ integer i,j;
           #10; req= $random;
  
     //computing expected values
+      expected_value=4'b0;
+      found=1'b0;
       for(j=0; j<N; j=j+1)
         begin
           if (req[j])
+            if(!found)
             begin
               expected_value[j] = 1'b1;
+              found=1'b1;
             end
         end
-    if (grant === expected_value)
+    if (grant == expected_value)
                 $display("%0t\t%b\t%b\t%b\tPASS", $time, req, grant, expected_value);
     else
                 $display("%0t\t%b\t%b\t%b\tFAIL", $time, req, grant, expected_value);
