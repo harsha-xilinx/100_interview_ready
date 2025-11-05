@@ -1,0 +1,18 @@
+What is a skid buffer, can you share in details and later implement using Verilog RTL.
+A skid buffer is a tiny elastic buffer inserted at a valid/ready (or similar) handshake boundary in a pipeline. Its job is to absorb one cycle (or a few cycles) of back-pressure from the downstream stage without stalling the upstream combinational path or creating timing/hold problems. Practically, a one-entry skid buffer lets the upstream produce data in the same cycle the downstream suddenly deasserts ready — the buffer captures that data so the upstream can see ready=1 again (if buffer had space) or so that downstream isn't forced to accept combinationally-driven data it cannot handle. It’s used a lot in streaming/AXI-Stream, network and CPU pipelines.
+
+Key point: when is the buffer used?
+The buffer in a skid buffer is only active when the bypass path cannot be used. That is:
+* Bypass condition: buffer empty && source valid && downstream ready → data goes straight through, no need to use buffer.
+* Buffer capture: buffer empty && source valid && downstream NOT ready → data cannot be sent, so we capture it in the buffer.
+* Buffer forward: buffer valid && downstream ready → the buffered data is now consumed (forwarded).
+
+Buffer empty, downstream ready
+Source is valid → bypass. Buffer is not touched.
+Buffer empty, downstream not ready
+Source is valid → buffer captures the data (buf_valid <= 1) for future forwarding.
+Buffer full, downstream ready
+We can now forward the buffered data to downstream.
+If source is also valid in the same cycle → consume buffer AND capture new incoming data (this is the “consume + refill” behavior).
+Buffer full, downstream not ready
+Buffer holds data → do nothing, wait.
