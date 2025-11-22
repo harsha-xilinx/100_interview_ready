@@ -1,0 +1,71 @@
+🔥 How to decide in just 5 questions (real Qualcomm checklist)
+
+Ask yourself:
+Q1: Does the logic require multiple steps in time?
+
+YES → FSM
+
+NO → normal RTL
+
+Q2: Do outputs change based on “previous cycle decisions”?
+
+YES → FSM
+
+NO → datapath
+
+Q3: Do I need to wait for something? (ready/valid, done, busy)
+
+YES → FSM
+
+NO → pure combinational/sequential
+
+Q4: Do I have more than 3 nested if/else conditions?
+
+YES → probably an FSM hiding in there.
+
+Q5: Could I draw my design as a flowchart?
+
+If yes → it’s naturally an FSM.
+
+🏆 Examples to make it crystal clear
+1️⃣ SYSTOLIC ARRAY
+
+No FSM inside PEs
+
+Just pipeline registers
+
+2️⃣ MATRIX CONTROLLER
+
+Needs FSM (load → compute → drain)
+
+3️⃣ FIFO
+
+No FSM
+
+Just pointer logic
+
+4️⃣ SPI Master
+
+Definitely FSM
+(stages: idle → load → shift bits → stop)
+
+5️⃣ ALU
+
+No FSM
+
+Pure combinational
+
+6️⃣ UART Receiver
+
+FSM
+(start bit → shift → stop bit)
+
+🔥 Want a cheat-table? (Super useful)
+  | Situation                  | FSM? | Why                      |
+| -------------------------- | ---- | ------------------------ |
+| Multi-step control         | ✔️   | Must sequence operations |
+| Protocol handling          | ✔️   | Start/stop/ack states    |
+| Repetitive dataflow        | ❌    | No state transitions     |
+| Pipelines                  | ❌    | Continuous flow          |
+| Conditional flow           | ✔️   | Perfect FSM use          |
+| Simple combinational block | ❌    | No state needed          |
