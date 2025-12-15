@@ -1,0 +1,47 @@
+what is a fixed priority arbiter ?
+A Fixed Priority Arbiter is an arbitration logic that always grants access based on a predefined, 
+constant priority order among multiple requesters.
+
+📌 Definition
+In a fixed priority arbiter:
+Each requester has a static priority
+Highest-priority active request always wins
+Priority never changes at runtime
+
+🔁 Example (4 requesters)
+Assume priority order:
+req[3] > req[2] > req[1] > req[0]   (req[3] is highest)
+
+If inputs are:
+req = 4'b1011   // req[3], req[1], req[0] active
+
+Then output:
+grant = 4'b1000  // req[3] gets grant
+
+Lower-priority requests are ignored even if they’ve been waiting longer.
+
+🧠 How it works (conceptually)
+Check highest-priority request
+If asserted → grant it
+Else check next priority
+
+🧾 Simple Verilog Example (Combinational)
+always @(*) begin
+  grant = 4'b0000;
+  if (req[3])      grant = 4'b1000;
+  else if (req[2]) grant = 4'b0100;
+  else if (req[1]) grant = 4'b0010;
+  else if (req[0]) grant = 4'b0001;
+end
+
+
+| Feature    | Fixed Priority   | Round-Robin |
+| ---------- | -------------- --| ----------- |
+| Priority   | Static           | Dynamic     |
+| Fairness   | ❌ Poor         | ✅ Good      |
+| Starvation | ❌ Yes          | ❌ No        |
+| Complexity | ✅ Low          | ❌ Higher    |
+
+
+
+Continue until one request is found
