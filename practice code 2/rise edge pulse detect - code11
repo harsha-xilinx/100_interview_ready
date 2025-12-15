@@ -1,0 +1,21 @@
+module rising_edge_detector (
+    input  wire clk,       // System clock
+    input  wire rst_n,     // Active-low synchronous reset
+    input  wire pulse_in,  // Input pulse
+    output reg  pulse_rise // High for 1 cycle on rising edge
+);
+
+    reg pulse_in_d;
+
+    // Sample the input and detect rising edge
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            pulse_in_d <= 1'b0;
+            pulse_rise <= 1'b0;
+        end else begin
+            pulse_in_d <= pulse_in;                // store previous value
+            pulse_rise <= pulse_in & ~pulse_in_d; // rising edge detection
+        end
+    end
+
+endmodule
