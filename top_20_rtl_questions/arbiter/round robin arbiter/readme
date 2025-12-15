@@ -1,0 +1,35 @@
+A Round-Robin Arbiter is an arbitration logic that rotates priority among requesters. 
+So that every requester gets a fair chance to access a shared resource.
+
+📌 Definition
+In a round-robin arbiter:
+Priority is dynamic, not fixed
+After a requester is granted, it goes to lowest priority
+Next arbitration starts from the next requester
+Prevents starvation
+
+Example:
+Priority: req[0] > req[1] > req[2] > req[3]
+Assume the last granted = req[1]
+req[2] → req[3] → req[0] → req[1]
+If requests are:
+req = 4'b1011   // req[3], req[1], req[0] active
+Grant will be:
+grant = 4'b0001  // req[0] gets grant (next after req[1])
+
+🔁 Round-Robin Arbiter Example (4 Requesters)
+Assume:
+Requesters: req[0] req[1] req[2] req[3]
+Initial last_grant = 0
+Arbitration checks start after last_grant
+
+📊 Cycle-by-Cycle Table
+| Cycle | last_grant (start) | req[3:0] | Priority Order Checked | Grant         | last_grant (end) |
+| ----- | ------------------ | -------- | ---------------------- | ------------- | ---------------- |
+| 0     | 0                  | 1111     | 1 → 2 → 3 → 0          | 0010 (req[1]) | 1                |
+| 1     | 1                  | 1011     | 2 → 3 → 0 → 1          | 1000 (req[3]) | 3                |
+| 2     | 3                  | 0101     | 0 → 1 → 2 → 3          | 0001 (req[0]) | 0                |
+| 3     | 0                  | 0100     | 1 → 2 → 3 → 0          | 0100 (req[2]) | 2                |
+
+
+
