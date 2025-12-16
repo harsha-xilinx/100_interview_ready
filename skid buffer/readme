@@ -16,3 +16,24 @@ We can now forward the buffered data to downstream.
 If source is also valid in the same cycle → consume buffer AND capture new incoming data (this is the “consume + refill” behavior).
 Buffer full, downstream not ready
 Buffer holds data → do nothing, wait.
+
+| Feature    | Skid Buffer | FIFO              |
+| ---------- | ----------- | ----------------- |
+| Depth      | 1           | N                 |
+| Latency    | 0 when free | ≥1                |
+| Throughput | Full        | Full              |
+| Use case   | Timing fix  | Elastic buffering |
+| Cost       | Very low    | Higher            |
+
+1️⃣1️⃣ Common interview questions
+Q1: Why not always use a FIFO?
+FIFO adds latency and area. Skid buffer solves the specific late-ready problem with minimal cost.
+
+Q2: Can skid buffer overflow?
+No, it only stores one beat. If downstream stalls longer, input is back-pressured.
+
+Q3: Where exactly do you place it?
+At ready/valid boundaries where ready is combinational and valid is registered.
+
+1️⃣2️⃣ One-liner definition (for interview)
+“A skid buffer is a single-entry buffer used in ready/valid interfaces to safely absorb one cycle of data when back-pressure is asserted late, preventing data loss without impacting throughput.”
