@@ -1,54 +1,46 @@
-module round_robin_arbiter #(parameter N=4)(
-  input clk, rst,
-  input [N-1:0] data_in,
-  output wire [N-1:0] data_out);
+module round_robin_arbiter #(parameter N=6) (
+input clk, rst_n,
+input [N-1:0] a,
+output reg [N-1:0] y);
 
-  reg [$clog2(N)-1:0] last_grant_reg, last_grant_nxt;
-  reg [N-1:0] data_reg, data_nxt;
+reg [$clog2(N)-1:0] last_grant_reg, last_grant_nxt;
+reg [N-1:0] data_reg, data_nxt;
 
-  always@ (posedge clk, posedge rst)
-  begin
-    if(rst)
-      begin
-        data_reg <= N'b0;
-        last_grant <= $clog2(N)'b0;
-      end
-    else
-      begin
-        data_reg <= data_nxt;
-        last_grant_reg <= last_grant_nxt;
-      end
-  end
+integer i, idx;
+reg found;
 
-  integer i;
-
-  // last grant calculation
-  always@*
+always@(posedge clk, negedge rst_n)
+begin
+  if(!rst_n)
     begin
-      if(last_grant_reg == N-1)
-        last_grant_next = 0;
-      else
-        last_grant_next = last_grant_reg + 1'b1;
+    data_reg <= 'b0;
+    last_grant_reg <= 'b0; 
     end
+  else
+    begin
+    data_reg <= data_nxt;
+    last_grant_reg <= last_grant_nxt;
+    end
+end
 
-  // data out
-  always@*
+always@*
+begin
+  last_grant_nxt  = last_grant_reg;
+  data_nxt ={N{1'b0}};
+  found = 1'b0;
+  for (i=1; i<=N; i=i+1)
   begin
-    data_nxt = N'b0;
-      if(data_in[last_grant_reg] == 1'b1)
-        data_nxt[last_grant_reg]=1'b1;
-      else
+    if(!found)
+    begin
+      idx = (last_grant_reg + i)% N;
+      if (a[idx])
         begin
-          for (i=last_grant_reg; i < N; i=i+1)
-          if(!found)
-            begin
-              if(data_in[i]==1)
-                found=1'b1;
-              else if (i==N)
-                i= -1;
-            end
+         data_nxt[idx]=1'b1;
+         last_grant_nxt = idx;
+         found = 1'b1;
         end
+    end
   end
-
-assign data_out = data_nxt;
+end
+assign y = data_reg;
 endmodule
